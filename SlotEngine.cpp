@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <string>
 
 #include <GL/glut.h>
 
@@ -17,17 +18,18 @@
 
 
 Slot2DEngine::Slot2DEngine(unsigned initWheels, unsigned initSlots
-							, CanvasObjectFactory* initSlotFactory)
+							, CanvasObjectFactory* initSlotFactory
+							, TexturePool * i_poolBgTexture)
 	: wheels(initWheels)
 	 ,slots(initSlots)
 	 ,slotFactory(initSlotFactory)
+	 ,poolBgTexture(i_poolBgTexture)
 {
 
 	// Add initial slot's objects created by slotFactory
 	// slotObjects is a container with:
 	//		(wheel, slot) - position on the machine
 	// 		obj - unique pointer to created canvas object
-	// ONLY slotObjects possess created canvas object and will delete it
 	for (unsigned wheel = 0; wheel < wheels; ++wheel)
 	{
 		for (unsigned slot = 0; slot < slots; ++slot)
@@ -51,20 +53,22 @@ Slot2DEngine::Slot2DEngine(unsigned initWheels, unsigned initSlots
 
 	// customize slotState (max for 5 wheels)
 	std::vector<float> delayed 	{0.4f, 0.8f, 1.2f, 1.4f, 1.8f};
-//	std::vector<float> speed 	{3.0f, 2.5f, 2.0f, 1.5f, 1.0f};
-	std::vector<float> speed 	(5, 3.0f);
-	std::vector<float> slowing 	{0.8f, 0.7f, 0.6f, 0.5f, 0.4f};
+	std::vector<float> speed 	{5.0f, 6.0f, 7.0f, 8.0f, 9.0f};
+//	std::vector<float> speed 	(5, 5.0f);
+	std::vector<float> slowing 	(5, 8.0f);//{0.8f, 0.7f, 0.6f, 0.5f, 0.4f};
 
-	for (auto & e : slowing) e += 0.4f;
-//	for (auto & e : slowing) e = 0.0f;
+	for (auto & e : delayed) e *= 3.0f;
 
 	slotState->set_delayed	(std::vector<float>(delayed.begin(), delayed.begin() + wheels));
 	slotState->set_speed	(std::vector<float>(speed.begin(), speed.begin() + wheels));
 	slotState->set_slowing	(std::vector<float>(slowing.begin(), slowing.begin() + wheels));
 
-
 	// create a Start button
-	startButton = std::unique_ptr<ActionObject>(new StartButton(1.5f, -2.5f, 1.0f, 0.5f, slotState.get()));
+	CanvasObject * tmp1 = new TextureRectStaticObject(poolBgTexture->get_texture("spin1"), 1.5f, -2.5f, -1.0f, 1.0f, 0.5f);
+	CanvasObject * tmp2 = new TextureRectStaticObject(poolBgTexture->get_texture("spin2"), 1.5f, -2.5f, -1.0f, 1.0f, 0.5f);
+
+	startButton = std::unique_ptr<ActionObject>
+					(new StartButton(1.5f, -2.5f, 1.0f, 0.5f, slotState.get(), tmp1, tmp2));
 }
 
 
@@ -100,6 +104,17 @@ void Slot2DEngine::render_scene()
 
 	startButton->draw();
 
+	// draw PFS
+	std::string str("fps = ");
+	str += std::to_string(fps.get_fps());
+
+	glLoadIdentity();
+	glRasterPos3f(XstartPoint, YstartPoint-2.8f, ZstartPoint);
+
+	for (auto e : str)
+	{
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, e);
+	}
 
 	glutSwapBuffers();
 }
@@ -190,6 +205,7 @@ void Slot2DEngine::animate()
 	std::chrono::duration<double> duration =
 			std::chrono::duration_cast<std::chrono::duration<double>>(t2 - timePrevCadr);
 
+	fps.add_cadr(duration.count());
 
 	auto isNeedNextSlot = slotState->turn(duration.count());
 	for (size_t i = 0; i < isNeedNextSlot.size(); ++i)
@@ -203,77 +219,4 @@ void Slot2DEngine::animate()
 	render_scene();
 }
 
-
-double SlotState::calc_delayed(unsigned wheel, double duration)
-{
-	double remain = 0.0;
-
-	if (delayed[wheel] == 0.0) return duration;
-
-	if (delayed[wheel] > duration)
-	{
-		delayed[wheel] -= duration;
-	}
-	else
-	{
-		remain = duration - delayed[wheel];
-		delayed[wheel] = 0.0;
-	}
-
-	return remain;
-}
-
-
-std::vector<bool> SlotState::turn(double duration)
-{
-	std::vector<bool> isNeedNextSlot(shift.size(), false);
-
-	for (size_t i = 0; i < shift.size(); ++i)
-	{
-		// do step for a wheel
-		if (speed[i] > 0.0f)
-			shift[i] += duration * speed[i];
-		else if (shift[i] > 0.0)
-			shift[i] += duration * hitchSpeed;
-
-		double remainDuration = calc_delayed(i, duration);
-
-		// decreasing wheel's speed
-		double nextSpeed = speed[i] - slowing[i] * remainDuration;
-		speed[i] = (nextSpeed  > 0) ? nextSpeed : 0;
-
-		if (shift[i] > maxShift)
-		{
-			shift[i] = (speed[i] > 0.0f) ? std::fmod(shift[i], maxShift) : 0.0f;
-			isNeedNextSlot[i] = true;
-		}
-	}
-
-	return isNeedNextSlot;
-}
-
-
-#include <iostream>
-void StartButton::on_click()
-{
-	std::cout << "Start Button clicked" << std::endl;
-	slotState->reset();
-}
-
-bool StartButton::is_clicked(float xCoord, float yCoord) const
-{
-	std::cout << "isClicked : " << xCoord << ", " << yCoord
-			<< " - need(" << x << ", " << y << " -> " << x + width << ", " << y + height << std::endl;
-
-	if (	xCoord >= x && yCoord >= y
-		&& 	xCoord <= x + width && yCoord <= y + height)
-		return true;
-
-	return false;
-}
-
-void StartButton::draw()
-{
-	obj->draw(0.0f, 0.0f);
-}
 

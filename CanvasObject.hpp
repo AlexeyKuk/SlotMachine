@@ -83,3 +83,31 @@ public:
 private:
 	GLuint texture;
 };
+
+
+
+
+class TextureRectStaticObject : public CanvasRectObject
+{
+public:
+
+	TextureRectStaticObject(GLuint initTexture, float x, float y, float z, float width, float height)
+		:  texture(initTexture)
+			, coord3f {x, y, z}
+			, rectWidth {width}
+			, rectHeight {height}
+	{}
+
+	/*virtual*/
+	void draw(float width, float height) const override;
+
+private:
+	GLuint texture;
+
+	// Offset from Identity position
+	float coord3f[3];
+
+	float rectWidth;
+	float rectHeight;
+};
+

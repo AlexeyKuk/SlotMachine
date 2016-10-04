@@ -11,30 +11,16 @@
 
 #include <iostream>
 
-using t_texture_path = std::pair<std::string, std::string>;
-
-static std::vector<t_texture_path> texturePath=
-	{
-//					{std::string("logo"), std::string("/home/alex/eclipse_mars/SlotMachine/Debug/NeHe.bmp")}
-					{std::string("angry"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/angry.png")}
-					,{std::string("chrome"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/chrome.png")}
-					,{std::string("es"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/es.png")}
-					,{std::string("linux"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/linux.png")}
-					,{std::string("rad"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/rad.png")}
-					,{std::string("smile"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/smile.png")}
-
-	};
-
+//using t_texture_path = std::pair<std::string, std::string>;
 
 
 void TexturePool2DSlot::load()
 {
-	countTexture = texturePath.size();
-	texture.resize(countTexture);
+	texture.resize(pathToTexture.size());
 
-	for (size_t i = 0; i < countTexture; ++i)
+	for (size_t i = 0; i < texture.size(); ++i)
 	{
-		texture[i] = SOIL_load_OGL_texture(	texturePath[i].second.c_str()
+		texture[i] = SOIL_load_OGL_texture(	pathToTexture[i].second.c_str()
 											, SOIL_LOAD_AUTO
 											, SOIL_CREATE_NEW_ID
 											, SOIL_FLAG_INVERT_Y
@@ -49,9 +35,9 @@ void TexturePool2DSlot::load()
 
 GLuint TexturePool2DSlot::get_texture(std::string str) const
 {
-	for (size_t i = 0; i < countTexture; ++i)
+	for (size_t i = 0; i < texture.size(); ++i)
 	{
-		if (str == texturePath[i].first)
+		if (str == pathToTexture[i].first)
 		{
 			return texture[i];
 		}
@@ -59,3 +45,6 @@ GLuint TexturePool2DSlot::get_texture(std::string str) const
 
 	return 0;
 }
+
+
+

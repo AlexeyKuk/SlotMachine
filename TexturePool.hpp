@@ -14,6 +14,29 @@
 #include <GL/glut.h>
 
 
+using t_texture_path = std::pair<std::string, std::string>;
+
+const std::vector<t_texture_path> slotTexturePath=
+	{
+//					{std::string("logo"), std::string("/home/alex/eclipse_mars/SlotMachine/Debug/NeHe.bmp")}
+					{std::string("angry"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/angry.png")}
+					,{std::string("chrome"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/chrome.png")}
+					,{std::string("es"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/es.png")}
+					,{std::string("linux"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/linux.png")}
+					,{std::string("rad"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/rad.png")}
+					,{std::string("smile"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/smile.png")}
+
+	};
+
+
+const std::vector<t_texture_path> bgTexturePath=
+	{
+					 {std::string("spin1"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/spin1.png")}
+					,{std::string("spin2"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/spin2.png")}
+
+
+	};
+
 class TexturePool
 {
 public:
@@ -23,12 +46,7 @@ public:
 	virtual unsigned get_count_of_texture() const = 0;
 
 	virtual ~TexturePool() {}
-
-private:
-
-	virtual void load() = 0;
 };
-
 
 
 
@@ -36,7 +54,9 @@ class TexturePool2DSlot : public TexturePool
 {
 public:
 
-	TexturePool2DSlot() { load(); }
+	TexturePool2DSlot(const std::vector<t_texture_path>& i_pathToTexture)
+		: pathToTexture(i_pathToTexture)
+	{ load(); }
 
 	/*virtual*/
 	GLuint get_texture(std::string str) const override;
@@ -45,15 +65,35 @@ public:
 	virtual GLuint get_texture_by_id(unsigned id) const override {return texture[id];}
 
 	/*virtual*/
-	unsigned get_count_of_texture() const {return countTexture;}
+	unsigned get_count_of_texture() const {return texture.size();}
 
 private:
-	/*virtual*/
-	void load() override;
 
+	void load();
 
-	size_t	countTexture {0};
+private:
 	std::vector<GLuint> texture;
+
+	const std::vector<t_texture_path>& pathToTexture;
+};
+
+
+
+class TextureSlots : public TexturePool2DSlot
+{
+public:
+	TextureSlots()
+		: TexturePool2DSlot(slotTexturePath)
+	{}
+};
+
+
+class TextureBg : public TexturePool2DSlot
+{
+public:
+	TextureBg()
+		: TexturePool2DSlot(bgTexturePath)
+	{}
 };
 
 

@@ -14,7 +14,7 @@
 class CanvasObjectFactory
 {
 public:
-	virtual CanvasObject* create(unsigned weel, unsigned slot) = 0;
+	virtual std::unique_ptr<CanvasObject> create(unsigned weel, unsigned slot) = 0;
 
 	virtual ~CanvasObjectFactory() {};
 };
@@ -35,7 +35,7 @@ class CanvasObjectFactory2D : public CanvasObjectFactory
 {
 public:
 	/*virtual*/
-	CanvasObject* create(unsigned weel, unsigned slot) override;
+	std::unique_ptr<CanvasObject> create(unsigned weel, unsigned slot) override;
 
 };
 
@@ -52,7 +52,7 @@ public:
 	{}
 
 	/*virtual*/
-	CanvasObject* create(unsigned weel, unsigned slot) override;
+	std::unique_ptr<CanvasObject> create(unsigned weel, unsigned slot) override;
 
 private:
 
