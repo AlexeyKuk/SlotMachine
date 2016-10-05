@@ -16,6 +16,9 @@
 
 using t_texture_path = std::pair<std::string, std::string>;
 
+
+// TODO : read from XML
+
 const std::vector<t_texture_path> slotTexturePath=
 	{
 					{std::string("angry"), std::string("pic/angry.png")}
@@ -30,8 +33,8 @@ const std::vector<t_texture_path> slotTexturePath=
 
 const std::vector<t_texture_path> bgTexturePath=
 	{
-					 {std::string("spin1"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/spin1.png")}
-					,{std::string("spin2"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/spin2.png")}
+					 {std::string("spin1"), std::string("pic/spin1.png")}
+					,{std::string("spin2"), std::string("pic/spin2.png")}
 	};
 
 class TexturePool
