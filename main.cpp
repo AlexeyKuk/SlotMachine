@@ -19,70 +19,103 @@
 #include "SlotEngine.hpp"
 #include "CanvasObjectFactory.hpp"
 #include "TexturePool.hpp"
-
-SlotEngine *slotEngine;
-TexturePool *slotTexturePool;
-TexturePool *bgTexturePool;
-
-const unsigned INITIAL_FPS = 60;
+#include "FPScalc.hpp"
+#include "constants.hpp"
 
 
-void display()
+// GLOBAL objects
+SlotEngine 	* slotEngine		{nullptr};
+TexturePool * slotTexturePool	{nullptr};
+TexturePool * bgTexturePool		{nullptr};
+FPScalc		* fps				{nullptr};
+
+CanvasObjectFactory * slotObjectFactory {nullptr};
+
+void init_global_objects()
 {
-	if (slotEngine)
-	{
-		slotEngine->render_scene();
-	}
+	fps = new FPScalc();
+
+	slotTexturePool 	= new TextureSlots();
+	bgTexturePool 		= new TextureBg();
+	slotObjectFactory 	= new TextureObjectFactory2D(slotTexturePool);
+
+	slotEngine =
+		new Slot2DEngine( COUNT_WHEELS, COUNT_SLOTS + 1 // +1 for hidden slot on the top
+						, slotObjectFactory
+						, bgTexturePool );
+
 }
 
+void display();
 
-void timer_func(int value)
-{
-	glutTimerFunc(1000/INITIAL_FPS, timer_func, 0);//1000/INITIAL_FPS
+void timer_func(int value);
 
-	if (slotEngine)
-	{
-		slotEngine->animate();
-	}
-}
-
-void on_mouse_click(int button, int state, int x, int y)
-{
-	double calcX = ((double)x/glutGet(GLUT_WINDOW_WIDTH) - 0.5) * 2 * sceneWidth;
-	double calcY = (0.5 - (double)y/glutGet(GLUT_WINDOW_HEIGHT)) * 2 * sceneHeight;
-
-//	std::cout << "Mouse clicked with {button:" << button
-//				<< " ,state:" << state
-//				<< " ,x:" << x
-//				<< " ,y:" << y
-//				<< " ,w:" << glutGet(GLUT_WINDOW_WIDTH)
-//				<< " ,h:" << glutGet(GLUT_WINDOW_HEIGHT)
-//				<< " ,calcX:" << calcX
-//				<< " , calcY:" << calcY
-//				<< std::endl;
-
-	slotEngine->on_click(button, state, calcX, calcY);
-}
+void on_mouse_click(int button, int state, int x, int y);
 
 
+/*
+ * 	MAIN function
+ */
 int main(int argc, char* argv[])
 {
 	openGLinit(argc, argv);
 
-
-	slotTexturePool = new TextureSlots();
-	bgTexturePool = new TextureBg();
-
-	slotEngine =
-		new Slot2DEngine(5,4, new TextureObjectFactory2D(slotTexturePool), bgTexturePool);
-
+	init_global_objects();
 
 	glutDisplayFunc(display);
 
 	glutMouseFunc(on_mouse_click);
 
+	// rise the timer
 	glutTimerFunc(0, timer_func, 0);
 
 	glutMainLoop();
 
+}//end main()
+
+
+/*
+ *		Functions process events
+ */
+
+
+void display()
+{
+	// fps calc
+	if (fps)
+		fps->add_cadr();
+
+	// start to render scene
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	if (slotEngine)
+		slotEngine->animate();
+
+	// draw fps on the screen
+	if (fps)
+		DrawFPS::draw(*fps);
+
+	// stop render and swap buffers
+	glutSwapBuffers();
 }
+
+
+void timer_func(int value)
+{
+	// rise timer to next screen update
+	glutTimerFunc(1000/INITIAL_FPS, timer_func, 0);
+
+	display();
+}
+
+
+void on_mouse_click(int button, int state, int x, int y)
+{
+	double calcX = ((double)x/glutGet(GLUT_WINDOW_WIDTH)) * (SCENE_HORIZ_MAX - SCENE_HORIZ_MIN) + SCENE_HORIZ_MIN;
+	double calcY = (1.0 - (double)y/glutGet(GLUT_WINDOW_HEIGHT)) * (SCENE_VERT_MAX - SCENE_VERT_MIN) + SCENE_VERT_MIN;
+
+	if (slotEngine)
+		slotEngine->on_click(button, state, calcX, calcY);
+}
+
+

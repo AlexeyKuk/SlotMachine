@@ -18,7 +18,6 @@ using t_texture_path = std::pair<std::string, std::string>;
 
 const std::vector<t_texture_path> slotTexturePath=
 	{
-//					{std::string("logo"), std::string("/home/alex/eclipse_mars/SlotMachine/Debug/NeHe.bmp")}
 					{std::string("angry"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/angry.png")}
 					,{std::string("chrome"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/chrome.png")}
 					,{std::string("es"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/es.png")}
@@ -33,8 +32,6 @@ const std::vector<t_texture_path> bgTexturePath=
 	{
 					 {std::string("spin1"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/spin1.png")}
 					,{std::string("spin2"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/spin2.png")}
-
-
 	};
 
 class TexturePool
@@ -65,7 +62,7 @@ public:
 	virtual GLuint get_texture_by_id(unsigned id) const override {return texture[id];}
 
 	/*virtual*/
-	unsigned get_count_of_texture() const {return texture.size();}
+	unsigned get_count_of_texture() const override {return texture.size();}
 
 private:
 
@@ -78,7 +75,7 @@ private:
 };
 
 
-
+// Pool for slot's textures
 class TextureSlots : public TexturePool2DSlot
 {
 public:
@@ -87,7 +84,7 @@ public:
 	{}
 };
 
-
+// Pool for background textures
 class TextureBg : public TexturePool2DSlot
 {
 public:

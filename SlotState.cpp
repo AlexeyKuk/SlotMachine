@@ -40,7 +40,7 @@ std::vector<bool> SlotState::turn(double duration)
 		// do step for a wheel
 		if (speed[i] > 0.0f)
 			shift[i] += duration * speed[i];
-		else if (shift[i] > 0.0)
+		else if (shift[i] > 0.0) // if need to hitch on placeholder
 			shift[i] += duration * hitchSpeed;
 
 		double remainDuration = calc_delayed(i, duration);

@@ -19,7 +19,10 @@ public:
 	virtual ~CanvasObjectFactory() {};
 };
 
-
+/*
+ * CanvasBgObjectFactory
+ * 			Factory for background objects
+ */
 class CanvasBgObjectFactory
 {
 public:

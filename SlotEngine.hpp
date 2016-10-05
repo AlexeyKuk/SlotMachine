@@ -17,6 +17,7 @@
 #include "ActionObject.hpp"
 #include "SlotState.hpp"
 #include "FPScalc.hpp"
+#include "constants.hpp"
 
 
 class SlotEngine
@@ -100,19 +101,6 @@ private:
 
 	std::unique_ptr<SlotState> slotState;
 	std::unique_ptr<ActionObject> startButton;
-
-
-	float 	  XstartPoint {-2.5f}
-			, YstartPoint {-1.0f}
-			, ZstartPoint {-1.0f};
-
-	float 	  dXoffsetWheel {1.0f}
-			, dYoffsetSlot	{1.0f};
-
-	float slotWidth = 0.9f;
-	float slotHeight = 0.9f;
-
-	FPScalc fps;
 };
 
 
