@@ -18,12 +18,12 @@ using t_texture_path = std::pair<std::string, std::string>;
 
 const std::vector<t_texture_path> slotTexturePath=
 	{
-					{std::string("angry"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/angry.png")}
-					,{std::string("chrome"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/chrome.png")}
-					,{std::string("es"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/es.png")}
-					,{std::string("linux"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/linux.png")}
-					,{std::string("rad"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/rad.png")}
-					,{std::string("smile"), std::string("/home/alex/eclipse_mars/SlotMachine/pic/smile.png")}
+					{std::string("angry"), std::string("pic/angry.png")}
+					,{std::string("chrome"), std::string("pic/chrome.png")}
+					,{std::string("es"), std::string("pic/es.png")}
+					,{std::string("linux"), std::string("pic/linux.png")}
+					,{std::string("rad"), std::string("pic/rad.png")}
+					,{std::string("smile"), std::string("pic/smile.png")}
 
 	};
 
