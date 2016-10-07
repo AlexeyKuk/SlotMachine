@@ -20,7 +20,9 @@
 #include "CanvasObjectFactory.hpp"
 #include "TexturePool.hpp"
 #include "FPScalc.hpp"
-#include "constants.hpp"
+//#include "constants.hpp"
+//#include "XMLreader.hpp"
+#include "XMLconfigRead.hpp"
 
 
 // GLOBAL objects
@@ -28,6 +30,8 @@ SlotEngine 	* slotEngine		{nullptr};
 TexturePool * slotTexturePool	{nullptr};
 TexturePool * bgTexturePool		{nullptr};
 FPScalc		* fps				{nullptr};
+
+xml_config_read::XMLconfigRead CONFIG;
 
 CanvasObjectFactory * slotObjectFactory {nullptr};
 
@@ -40,7 +44,7 @@ void init_global_objects()
 	slotObjectFactory 	= new TextureObjectFactory2D(slotTexturePool);
 
 	slotEngine =
-		new Slot2DEngine( COUNT_WHEELS, COUNT_SLOTS + 1 // +1 for hidden slot on the top
+		new Slot2DEngine( CONFIG.get_COUNT_WHEELS(), CONFIG.get_COUNT_SLOTS() + 1 // +1 for hidden slot on the top
 						, slotObjectFactory
 						, bgTexturePool );
 
@@ -103,7 +107,7 @@ void display()
 void timer_func(int value)
 {
 	// rise timer to next screen update
-	glutTimerFunc(1000/INITIAL_FPS, timer_func, 0);
+	glutTimerFunc(1000/CONFIG.get_INITIAL_FPS(), timer_func, 0);
 
 	display();
 }
@@ -111,8 +115,10 @@ void timer_func(int value)
 
 void on_mouse_click(int button, int state, int x, int y)
 {
-	double calcX = ((double)x/glutGet(GLUT_WINDOW_WIDTH)) * (SCENE_HORIZ_MAX - SCENE_HORIZ_MIN) + SCENE_HORIZ_MIN;
-	double calcY = (1.0 - (double)y/glutGet(GLUT_WINDOW_HEIGHT)) * (SCENE_VERT_MAX - SCENE_VERT_MIN) + SCENE_VERT_MIN;
+	double calcX = ((double)x/glutGet(GLUT_WINDOW_WIDTH))
+			* (CONFIG.get_SCENE_HORIZ_MAX() - CONFIG.get_SCENE_HORIZ_MIN()) + CONFIG.get_SCENE_HORIZ_MIN();
+	double calcY = (1.0 - (double)y/glutGet(GLUT_WINDOW_HEIGHT))
+			* (CONFIG.get_SCENE_VERT_MAX() - CONFIG.get_SCENE_VERT_MIN()) + CONFIG.get_SCENE_VERT_MIN();
 
 	if (slotEngine)
 		slotEngine->on_click(button, state, calcX, calcY);

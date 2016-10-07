@@ -80,7 +80,8 @@ public:
 		str += std::to_string(fps.get_fps());
 
 		glLoadIdentity();
-		glRasterPos3f(DRAW_FPS_POS[0], DRAW_FPS_POS[1], DRAW_FPS_POS[2]);
+		float * p_DRAW_FPS_POS = CONFIG.get_DRAW_FPS_POS();
+		glRasterPos3f(p_DRAW_FPS_POS[0], p_DRAW_FPS_POS[1], p_DRAW_FPS_POS[2]);
 
 		for (auto e : str)
 		{

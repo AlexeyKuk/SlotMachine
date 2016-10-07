@@ -42,47 +42,51 @@ Slot2DEngine::Slot2DEngine(unsigned initWheels, unsigned initSlots
 	}
 
 	// Create background objects to hide regions on top and bottom for creating wheels animation.
-	bgObjects.emplace_back(CanvasBgObjectFactory::create2DRect(   LEFT_SLOT_BORDER
-																, BOT_SLOT_BORDER - OFFSET_SLOT
-																, Z_SLOT_COORDINATE
-																, COUNT_WHEELS * OFFSET_WHEEL
-																, OFFSET_SLOT )
+	bgObjects.emplace_back(CanvasBgObjectFactory::create2DRect(   CONFIG.get_LEFT_SLOT_BORDER()
+																, CONFIG.get_BOT_SLOT_BORDER() - CONFIG.get_OFFSET_SLOT()
+																, CONFIG.get_Z_SLOT_COORDINATE()
+																, CONFIG.get_COUNT_WHEELS() * CONFIG.get_OFFSET_WHEEL()
+																, CONFIG.get_OFFSET_SLOT() )
 							);
-	bgObjects.emplace_back(CanvasBgObjectFactory::create2DRect(   LEFT_SLOT_BORDER
-																, BOT_SLOT_BORDER + COUNT_SLOTS * OFFSET_SLOT
-																, Z_SLOT_COORDINATE
-																, COUNT_WHEELS * OFFSET_WHEEL
-																, OFFSET_SLOT )
+	bgObjects.emplace_back(CanvasBgObjectFactory::create2DRect(   CONFIG.get_LEFT_SLOT_BORDER()
+																, CONFIG.get_BOT_SLOT_BORDER() + CONFIG.get_COUNT_SLOTS() * CONFIG.get_OFFSET_SLOT()
+																, CONFIG.get_Z_SLOT_COORDINATE()
+																, CONFIG.get_COUNT_WHEELS() * CONFIG.get_OFFSET_WHEEL()
+																, CONFIG.get_OFFSET_SLOT() )
 							);
 
 	// create slot's state to set animation parameters
 	slotState = std::unique_ptr<SlotState>(new SlotState(wheels));
 
-	slotState->set_delayed	(std::vector<float>(&WHEEL_DELAYED[0], &WHEEL_DELAYED[0] + wheels));
-	slotState->set_speed	(std::vector<float>(&WHEEL_SPEED[0]  , &WHEEL_SPEED[0]   + wheels));
-	slotState->set_slowing	(std::vector<float>(&WHEEL_SLOWING[0], &WHEEL_SLOWING[0] + wheels));
+	float * p_WHEEL_DELAYED	= CONFIG.get_WHEEL_DELAYED();
+	float * p_WHEEL_SPEED	= CONFIG.get_WHEEL_SPEED();
+	float * p_WHEEL_SLOWING	= CONFIG.get_WHEEL_SLOWING();
+
+	slotState->set_delayed	(std::vector<float>(&p_WHEEL_DELAYED[0], &p_WHEEL_DELAYED[0] + wheels));
+	slotState->set_speed	(std::vector<float>(&p_WHEEL_SPEED[0]  , &p_WHEEL_SPEED[0]   + wheels));
+	slotState->set_slowing	(std::vector<float>(&p_WHEEL_SLOWING[0], &p_WHEEL_SLOWING[0] + wheels));
 
 
 	// create a Start button
-	CanvasObject * textureSpin1 = new TextureRectStaticObject(poolBgTexture->get_texture(START_BUTTON_TEXTURE_1)
-																, START_BUTTON_LEFT
-																, START_BUTTON_BOT
-																, Z_SLOT_COORDINATE
-																, START_BUTTON_WIDTH
-																, START_BUTTON_HEIGHT);
+	CanvasObject * textureSpin1 = new TextureRectStaticObject(poolBgTexture->get_texture(CONFIG.get_START_BUTTON_TEXTURE_1())
+																, CONFIG.get_START_BUTTON_LEFT()
+																, CONFIG.get_START_BUTTON_BOT()
+																, CONFIG.get_Z_SLOT_COORDINATE()
+																, CONFIG.get_START_BUTTON_WIDTH()
+																, CONFIG.get_START_BUTTON_HEIGHT() );
 
-	CanvasObject * textureSpin2 = new TextureRectStaticObject(poolBgTexture->get_texture(START_BUTTON_TEXTURE_2)
-																, START_BUTTON_LEFT
-																, START_BUTTON_BOT
-																, Z_SLOT_COORDINATE
-																, START_BUTTON_WIDTH
-																, START_BUTTON_HEIGHT);
+	CanvasObject * textureSpin2 = new TextureRectStaticObject(poolBgTexture->get_texture(CONFIG.get_START_BUTTON_TEXTURE_2())
+																, CONFIG.get_START_BUTTON_LEFT()
+																, CONFIG.get_START_BUTTON_BOT()
+																, CONFIG.get_Z_SLOT_COORDINATE()
+																, CONFIG.get_START_BUTTON_WIDTH()
+																, CONFIG.get_START_BUTTON_HEIGHT());
 
 	startButton = std::unique_ptr<ActionObject>
-					(new StartButton(  START_BUTTON_LEFT
-									 , START_BUTTON_BOT
-									 , START_BUTTON_WIDTH
-									 , START_BUTTON_HEIGHT
+					(new StartButton(  CONFIG.get_START_BUTTON_LEFT()
+									 , CONFIG.get_START_BUTTON_BOT()
+									 , CONFIG.get_START_BUTTON_WIDTH()
+									 , CONFIG.get_START_BUTTON_HEIGHT()
 									 , slotState.get()
 									 , textureSpin1, textureSpin2)
 					);
@@ -103,21 +107,23 @@ void Slot2DEngine::render_scene()
 	{
 		glLoadIdentity();
 
-		glTranslatef( LEFT_SLOT_BORDER + OFFSET_WHEEL * wheel
-					, BOT_SLOT_BORDER - slotState->get_shift(wheel)
-					, Z_SLOT_COORDINATE );
+		glTranslatef( CONFIG.get_LEFT_SLOT_BORDER() + CONFIG.get_OFFSET_WHEEL() * wheel
+					, CONFIG.get_BOT_SLOT_BORDER() - slotState->get_shift(wheel)
+					, CONFIG.get_Z_SLOT_COORDINATE() );
 
 		draw_wheel(wheel);
 	}
 
 
 	// draw BG objects
-	glColor3f(BG_COLOR[0], BG_COLOR[1], BG_COLOR[2]);
+	float * p_BG_COLOR = CONFIG.get_BG_COLOR();
+	glColor3f(p_BG_COLOR[0], p_BG_COLOR[1], p_BG_COLOR[2]);
 
 	for (const auto& obj : bgObjects)
 		obj->draw(0.0f, 0.0f); // width and height are unused
 
-	glColor3f(ALL_COLORS[0], ALL_COLORS[1], ALL_COLORS[2]);
+	float * p_ALL_COLORS = CONFIG.get_ALL_COLORS();
+	glColor3f(p_ALL_COLORS[0], p_ALL_COLORS[1], p_ALL_COLORS[2]);
 
 
 	startButton->draw();
@@ -130,9 +136,9 @@ void Slot2DEngine::draw_wheel(unsigned wheel)
 	{
 		auto * obj = find_object(wheel, slot);
 		if (obj != nullptr)
-			obj->draw(SLOT_WIDTH, SLOT_HEIGHT);
+			obj->draw(CONFIG.get_SLOT_WIDTH(), CONFIG.get_SLOT_HEIGHT());
 
-		glTranslatef(0.0f, OFFSET_WHEEL, 0.0f);
+		glTranslatef(0.0f, CONFIG.get_OFFSET_WHEEL(), 0.0f);
 	}
 }
 

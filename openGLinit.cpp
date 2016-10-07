@@ -15,7 +15,7 @@ void openGLinit(int argc, char* argv[])
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 
-	glutInitWindowSize(INIT_WINDOW_WIDTH, INIT_WINDOW_HEIGHT);
+	glutInitWindowSize(CONFIG.get_INIT_WINDOW_WIDTH(), CONFIG.get_INIT_WINDOW_HEIGHT());
 
 	glutCreateWindow("SlotMachine");
 
@@ -28,13 +28,16 @@ void onResize (int newWidth, int newHeight)
 
 	glViewport(0,0,newWidth,newHeight);
 
-	glOrtho(SCENE_HORIZ_MIN, SCENE_HORIZ_MAX, SCENE_VERT_MIN, SCENE_VERT_MAX, NEAREST_Z, FARTHEST_Z);
+	glOrtho(CONFIG.get_SCENE_HORIZ_MIN(), CONFIG.get_SCENE_HORIZ_MAX()
+			, CONFIG.get_SCENE_VERT_MIN(), CONFIG.get_SCENE_VERT_MAX()
+			, CONFIG.get_NEAREST_Z(), CONFIG.get_FARTHEST_Z());
 }
 
 
 void reshape (int w, int h)
 {
-	glClearColor(BG_COLOR[0], BG_COLOR[1], BG_COLOR[2], BG_COLOR[3]);
+	float * p_BG_COLOR = CONFIG.get_BG_COLOR();
+	glClearColor(p_BG_COLOR[0], p_BG_COLOR[1], p_BG_COLOR[2], p_BG_COLOR[3]);
 	glClearDepth(1.0);
 	glDepthFunc(GL_LESS);
 	glShadeModel(GL_SMOOTH);
